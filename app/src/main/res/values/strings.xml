@@ -1,0 +1,11 @@
+<resources>
+
+    <string name="app_name">Covid19App</string>
+
+    <string name="country_name">País</string>
+    <string name="confirmed">Confirmados:</string>
+    <string name="deaths">Mortos:</string>
+    <string name="recovered">Recuperados:</string>
+    <string name="zero">0</string>
+
+</resources>
