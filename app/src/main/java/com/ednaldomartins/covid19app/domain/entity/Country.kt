@@ -26,5 +26,7 @@ class Country (
     var newRecovered: Int = 0,
 
     @Json(name = "TotalRecovered")
-    var totalRecovered: Int = 0
+    var totalRecovered: Int = 0,
+
+    var flagImage: String = ""
 ): Serializable
