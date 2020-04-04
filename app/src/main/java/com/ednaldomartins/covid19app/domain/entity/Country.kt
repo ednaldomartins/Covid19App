@@ -5,7 +5,10 @@ import com.squareup.moshi.Json
 
 class Country (
     @Json(name = "Country")
-    var country: String = "",
+    var countryName: String = "",
+
+    @Json(name = "CountryCode")
+    var countryCode: String = "",
 
     @Json(name = "Slug")
     var slug: String = "",

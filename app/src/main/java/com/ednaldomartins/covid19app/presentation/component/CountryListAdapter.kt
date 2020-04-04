@@ -26,7 +26,7 @@ class CountryListAdapter (
 
     override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
         countryList[position].let{
-            holder.mTextCountryName.text = it.country
+            holder.mTextCountryName.text = it.countryName
             //  total
             holder.mTextCountryTotalConfirmed.text = ( "${it.totalConfirmed}" )
             holder.mTextCountryTotalDeaths.text = ( "${it.totalDeaths}" )
