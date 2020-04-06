@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.ednaldomartins.covid19app.database.api.CovidApi
 import com.ednaldomartins.covid19app.domain.entity.Country
 import com.ednaldomartins.covid19app.domain.entity.CountryJson
-import com.ednaldomartins.covid19app.util.CountryCode
+import com.ednaldomartins.covid19app.util.CountryInfo
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.*
 
@@ -42,6 +42,7 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app) {
             else {
                 _requestCountryList.value = resultList
                 requestFlagImage( _requestCountryList.value!!.countries!! )
+                setPtBrLanguage( _requestCountryList.value!!.countries!! )
             }
 
         }
@@ -53,9 +54,23 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun requestFlagImage(coutryList: List<Country>?) {
-        for (i in coutryList!!.indices)
-            coutryList[i].flagImage = CountryCode.URL_ROOT_FLAG + coutryList[i].countryCode + CountryCode.URL_TYPE_FLAG
+    private fun requestFlagImage(coutryList: List<Country>) {
+        for (i in coutryList.indices)
+            coutryList[i].flagImage = CountryInfo.URL_ROOT_FLAG + coutryList[i].countryCode + CountryInfo.URL_TYPE_FLAG
+    }
+
+    private fun setPtBrLanguage(coutryList: List<Country>) {
+        for (i in coutryList.indices) {
+            for (j in CountryInfo.list.indices) {
+                //  list[j][3] -> codigo do pais
+                //  list[j][1] -> nome do pais em PtBR
+                if (coutryList[i].countryCode == CountryInfo.list[j][3]) {
+                    coutryList[i].countryName = CountryInfo.list[j][1]
+                    break   //  break for J
+                }
+            }
+        }
+
     }
 
     private fun requestErro(countryList: MutableLiveData<CountryJson>, s: String) {
