@@ -1,6 +1,7 @@
 <resources>
 
-    <string name="app_name">Covid19App</string>
+    <string name="app_name">Covid19 Statistics</string>
+    <string name="splash_powered">Powered By Covid-19 API</string>
 
     <string name="country_name">País</string>
     <string name="confirmed">Confirmados:</string>
