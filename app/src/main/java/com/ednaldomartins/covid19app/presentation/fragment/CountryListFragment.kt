@@ -4,20 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ednaldomartins.covid19app.R
 import com.ednaldomartins.covid19app.domain.viewmodel.CountryListApiViewModel
 import com.ednaldomartins.covid19app.domain.viewmodel.ViewModelFactory
 import com.ednaldomartins.covid19app.presentation.component.CountryListAdapter
 
 
-class CountryListFragment : Fragment() {
+class CountryListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var mListProgressBar: ProgressBar
     private lateinit var mCountryRecyclerView: RecyclerView
 
     private lateinit var countryViewModelFactory: ViewModelFactory
@@ -28,10 +31,9 @@ class CountryListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_country_list, container, false)
 
-        // Init ViewModel
+        // Get Instance ViewModel
         val application = requireNotNull(this.activity).application
         countryViewModelFactory = ViewModelFactory(application)
         countryListApiViewModel = ViewModelProvider(activity!!, countryViewModelFactory).get(CountryListApiViewModel::class.java)
@@ -45,20 +47,30 @@ class CountryListFragment : Fragment() {
         mCountryRecyclerView.setHasFixedSize(true)
 
         // Request Country List
-        countryListApiViewModel.requestCountryList()
         countryListApiViewModel.responseCountryList.observe(this.viewLifecycleOwner, Observer {
+            mListProgressBar.visibility = View.GONE
             it?.let { list ->
                 countryListAdapter = CountryListAdapter(this.activity, list.countries!!)
                 mCountryRecyclerView.adapter = countryListAdapter
+                mCountryRecyclerView.visibility = View.VISIBLE
             }
         })
 
         return view
     }
 
-
     private fun initViews(v: View) {
+        mSwipeRefreshLayout = v.findViewById(R.id.list_fragment_swipe_refresh_layout)
+        mSwipeRefreshLayout.setOnRefreshListener(this)
+        mListProgressBar = v.findViewById(R.id.fragment_list_progress_bar)
         mCountryRecyclerView = v.findViewById(R.id.country_list_recycle_view)
+    }
+
+    override fun onRefresh() {
+        mListProgressBar.visibility = View.VISIBLE
+        countryListApiViewModel.requestCountryList()
+        mSwipeRefreshLayout.isRefreshing = false
+        mCountryRecyclerView.visibility = View.GONE
     }
 
 }
