@@ -1,37 +1,43 @@
 package com.ednaldomartins.covid19app.domain.viewmodel
 
 import android.app.Application
+import android.os.Parcelable
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.ednaldomartins.covid19app.database.api.CovidApi
-import com.ednaldomartins.covid19app.domain.entity.Country
 import com.ednaldomartins.covid19app.domain.entity.CountryJson
+import com.ednaldomartins.covid19app.domain.entity.CountryListJson
+import com.ednaldomartins.covid19app.domain.entity.CountryStatusJson
 import com.ednaldomartins.covid19app.util.CountryInfo
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.*
 
-class CountryListApiViewModel (var app: Application) : AndroidViewModel(app) {
+class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), LifecycleObserver {
 
     // Coroutines
     private var viewModelJob = Job()
     private val uiCoroutineScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    private var _responseCountry = MutableLiveData<Country>()
-    val responseCountryJson: LiveData<Country> get() = _responseCountry
+    private var _responseCountry = MutableLiveData<CountryJson>()
+    val responseCountryJson: LiveData<CountryJson> get() = _responseCountry
 
-    private var _requestCountryList = MutableLiveData<CountryJson>()
-    val responseCountryList: LiveData<CountryJson> get() = _requestCountryList
+    private var _responseCountryStatus = MutableLiveData<List<CountryStatusJson>>()
+    val responseCountryStatusJson: LiveData<List<CountryStatusJson>> get() = _responseCountryStatus
 
+    private var _requestCountryList = MutableLiveData<CountryListJson>()
+    val responseCountryList: LiveData<CountryListJson> get() = _requestCountryList
+
+    /**
+     *  Funcao para chamar lista de paises
+     */
     fun requestCountryList() {
         uiCoroutineScope.launch {
-            val getCallDeferred = CovidApi.retrofitService.callCountryList()
+            val getCallDeferred = CovidApi.retrofitService.callCountryListAsync()
             setRequestResult(getCallDeferred)
         }
     }
 
-    private suspend fun setRequestResult(callDeferred: Deferred<CountryJson>) {
+    private suspend fun setRequestResult(callDeferred: Deferred<CountryListJson>) {
         try {
             // pegar lista de paises da API
             val resultList = callDeferred.await()
@@ -54,12 +60,43 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun requestFlagImage(coutryList: List<Country>) {
+    /**
+     *  Funcao para chamar pais por status
+     */
+    fun requestCountryStatus(country: String, status: String) {
+        uiCoroutineScope.launch {
+            val getCallDeferred = CovidApi.retrofitService.callCountryStatusAsync(country, status)
+            setRequestResultStatus(getCallDeferred)
+        }
+    }
+
+    private suspend fun setRequestResultStatus(callDeferred: Deferred<List<CountryStatusJson>>) {
+        try {
+            // pegar lista de status do pais na API
+            val resultList = callDeferred.await()
+
+            if (resultList.isNotEmpty()) {
+                // realizar transacao
+            }
+            else {
+                // nao tem nenhum dados sobre as datas
+            }
+
+        }
+        catch(t: JsonDataException) {
+            //
+        }
+        catch (t: Throwable) {
+            //
+        }
+    }
+
+    private fun requestFlagImage(coutryList: List<CountryJson>) {
         for (i in coutryList.indices)
             coutryList[i].flagImage = CountryInfo.URL_ROOT_FLAG + coutryList[i].countryCode + CountryInfo.URL_TYPE_FLAG
     }
 
-    private fun setPtBrLanguage(coutryList: List<Country>) {
+    private fun setPtBrLanguage(coutryList: List<CountryJson>) {
         for (i in coutryList.indices) {
             for (j in CountryInfo.list.indices) {
                 //  list[j][3] -> codigo do pais
@@ -70,13 +107,12 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app) {
                 }
             }
         }
-
     }
 
-    private fun requestErro(countryList: MutableLiveData<CountryJson>, s: String) {
+    private fun requestErro(countryList: MutableLiveData<CountryListJson>, s: String) {
         Toast.makeText(getApplication(), s,Toast.LENGTH_LONG).show()
-        val countiesJson = CountryJson(  )
-        countiesJson.countries = listOfNotNull( Country(countryName = s) )
+        val countiesJson = CountryListJson(  )
+        countiesJson.countries = listOfNotNull( CountryJson(countryName = s) )
         countryList.value = ( countiesJson )
     }
 

@@ -8,24 +8,26 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ednaldomartins.covid19app.R
-import com.ednaldomartins.covid19app.domain.entity.Country
+import com.ednaldomartins.covid19app.domain.entity.CountryJson
 
 class CountryListAdapter (
     private var context: Context?,
-    private var countryList: List<Country>
+    private var countryList: List<CountryJson>,
+    private var onClick: CountryViewHolder.OnCardViewClickListener? = null
 )
     : RecyclerView.Adapter<CountryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
         val view: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.viewholder_country, parent, false)
 
-        return CountryViewHolder(view)
+        return CountryViewHolder(view, onClick)
     }
 
     override fun getItemCount(): Int = countryList.size
 
     override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
         countryList[position].let{
+            holder.slugName = it.slug
             holder.mTextCountryName.text = it.countryName
             //  total
             holder.mTextCountryTotalConfirmed.text = ( "${it.totalConfirmed}" )
