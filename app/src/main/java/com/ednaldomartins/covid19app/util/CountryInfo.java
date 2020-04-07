@@ -4,7 +4,7 @@ public class CountryInfo {
 
     //  exemplo: "https://www.countryflags.io/" + CODE + "/flat/64.png"
     public static final String URL_ROOT_FLAG = "https://www.countryflags.io/";
-    public static final String URL_TYPE_FLAG = "/flat/64.png";
+    public static final String URL_TYPE_FLAG = "/shiny/64.png";  //  "/flat/64.png" ou "/shiny/64.png"
 
     /**
      *  [*][0] = gentilico do pais

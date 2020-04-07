@@ -25,29 +25,38 @@
             android:layout_height="match_parent"
             android:padding="8dp">
 
-            <ImageView
-                android:id="@+id/viewholder_country_flag"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="end"
-                android:cropToPadding="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_flag_64dp" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/viewholder_flag_cardview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:id="@+id/viewholder_country_flag"
+                    android:src="@drawable/ic_flag_64dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:scaleX="1.6"
+                    android:scaleY="1.6" />
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/viewholder_country_name"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center"
                 android:text="@string/country_name"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/title_size"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/viewholder_country_flag"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -118,7 +127,7 @@
 
             <TextView
                 android:id="@+id/viewholder_country_total_recovered"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -138,6 +147,7 @@
                 android:text="@string/zero"
                 android:textColor="@android:color/holo_orange_dark"
                 android:textSize="@dimen/text_size"
+                app:layout_constraintEnd_toStartOf="@+id/viewholder_flag_cardview"
                 app:layout_constraintStart_toEndOf="@+id/viewholder_country_total_confirmed"
                 app:layout_constraintTop_toBottomOf="@+id/viewholder_country_name" />
 
@@ -151,6 +161,7 @@
                 android:text="@string/zero"
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="@dimen/text_size"
+                app:layout_constraintEnd_toStartOf="@+id/viewholder_flag_cardview"
                 app:layout_constraintStart_toEndOf="@+id/viewholder_country_total_deaths"
                 app:layout_constraintTop_toBottomOf="@+id/viewholder_country_new_confirmed" />
 
@@ -165,6 +176,7 @@
                 android:text="@string/zero"
                 android:textColor="@android:color/holo_green_dark"
                 android:textSize="@dimen/text_size"
+                app:layout_constraintEnd_toStartOf="@+id/viewholder_flag_cardview"
                 app:layout_constraintStart_toEndOf="@+id/viewholder_country_total_recovered"
                 app:layout_constraintTop_toBottomOf="@+id/viewholder_country_new_deaths" />
 
