@@ -90,4 +90,18 @@ class CountryListFragment :
         view!!.findNavController().navigate(R.id.action_countryListFragment_to_countryStatusFragment)
     }
 
+    override fun onStop() {
+        mCountryRecyclerView.layoutManager?.let {
+            countryListApiViewModel.setRecyclerViewState(it.onSaveInstanceState())
+        }
+        super.onStop()
+    }
+
+    override fun onResume() {
+        countryListApiViewModel.recyclerViewState?.let {
+            mCountryRecyclerView.layoutManager?.onRestoreInstanceState(it)
+        }
+        super.onResume()
+    }
+
 }

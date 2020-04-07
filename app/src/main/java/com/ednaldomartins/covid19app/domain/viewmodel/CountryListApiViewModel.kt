@@ -27,6 +27,21 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
     private var _requestCountryList = MutableLiveData<CountryListJson>()
     val responseCountryList: LiveData<CountryListJson> get() = _requestCountryList
 
+    //  RecyclerViewState
+    private var _recyclerViewState: Parcelable? = null
+    val recyclerViewState: Parcelable? get() = _recyclerViewState
+    fun setRecyclerViewState(recyclerViewState: Parcelable?) {
+        this._recyclerViewState = recyclerViewState
+    }
+
+//    //  LifeCycle
+//    private var _lifecycle: Lifecycle? = null
+//    val lifecycle: Lifecycle? get() = _lifecycle
+//    fun setLifecycle(lf: Lifecycle) {
+//        _lifecycle = lf
+//        _lifecycle?.addObserver(this)
+//    }
+
     /**
      *  Funcao para chamar lista de paises
      */
