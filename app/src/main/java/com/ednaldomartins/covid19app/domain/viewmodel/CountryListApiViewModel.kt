@@ -27,6 +27,9 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
     private var _requestCountryList = MutableLiveData<CountryListJson>()
     val responseCountryList: LiveData<CountryListJson> get() = _requestCountryList
 
+    private var _presentationCountryList = MutableLiveData<List<CountryJson>>()
+    val presentationCountryList: LiveData<List<CountryJson>> get() = _presentationCountryList
+
     //  RecyclerViewState
     private var _recyclerViewState: Parcelable? = null
     val recyclerViewState: Parcelable? get() = _recyclerViewState
@@ -42,8 +45,17 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
 //        _lifecycle?.addObserver(this)
 //    }
 
+    companion object {
+        private const val PRESENTATION_LIST_SIZE: Int = 20
+    }
+
+    private var _actualPage: Int = 1
+    val actualPage: Int get() = _actualPage
+    private var _totalPages: Int = 1
+    val totalPages: Int get() = _totalPages
+
     /**
-     *  Funcao para chamar lista de paises
+     *  Funcoes para chamar lista de paisese apresentar
      */
     fun requestCountryList() {
         uiCoroutineScope.launch {
@@ -59,11 +71,13 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
 
             if (resultList.countries.isNullOrEmpty())
                 requestErro(_requestCountryList, "A busca não encontrou países.")
-            //  atualizar lista e pegar bandeiras dos países
+            //  atualizar lista e pegar bandeira dos países
             else {
                 _requestCountryList.value = resultList
                 requestFlagImage( _requestCountryList.value!!.countries!! )
                 setPtBrLanguage( _requestCountryList.value!!.countries!! )
+                _totalPages = _requestCountryList.value!!.countries!!.size / PRESENTATION_LIST_SIZE
+                setPresentationList()
             }
 
         }
@@ -75,8 +89,27 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         }
     }
 
+    fun setPresentationList (page: Int = _actualPage) {
+        _actualPage = validatePage(page)
+        uiCoroutineScope.launch {
+            _requestCountryList.value?.let {
+                val sizeSubList: Int =
+                    if (_actualPage != _totalPages) PRESENTATION_LIST_SIZE *_actualPage
+                    else it.countries!!.size
+
+                _presentationCountryList.postValue( it.countries!!.subList( (_actualPage-1)* PRESENTATION_LIST_SIZE, sizeSubList) )
+            }
+        }
+    }
+
+    private fun validatePage(page: Int) =  when {
+        (page < 1) -> 1
+        (page > _totalPages) -> _totalPages
+        else -> page
+    }
+
     /**
-     *  Funcao para chamar pais por status
+     *  Funcao para chamar dados dos status por pais
      */
     fun requestCountryStatus(country: String, status: String) {
         uiCoroutineScope.launch {
@@ -106,6 +139,9 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         }
     }
 
+    /**
+     * Funcoes para tratar e adaptar dados da apresentacao
+     */
     private fun requestFlagImage(coutryList: List<CountryJson>) {
         for (i in coutryList.indices)
             coutryList[i].flagImage = CountryInfo.URL_ROOT_FLAG + coutryList[i].countryCode + CountryInfo.URL_TYPE_FLAG
@@ -124,6 +160,9 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         }
     }
 
+    /**
+     * funcoes para retornar mensagem de erro
+     */
     private fun requestErro(countryList: MutableLiveData<CountryListJson>, s: String) {
         Toast.makeText(getApplication(), s,Toast.LENGTH_LONG).show()
         val countiesJson = CountryListJson(  )
