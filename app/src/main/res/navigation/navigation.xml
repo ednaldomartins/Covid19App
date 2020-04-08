@@ -24,6 +24,15 @@
         android:id="@+id/countryListFragment"
         android:name="com.ednaldomartins.covid19app.presentation.fragment.CountryListFragment"
         android:label="fragment_country_list"
-        tools:layout="@layout/fragment_country_list" />
+        tools:layout="@layout/fragment_country_list" >
+        <action
+            android:id="@+id/action_countryListFragment_to_countryStatusFragment"
+            app:destination="@id/countryStatusFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/countryStatusFragment"
+        android:name="com.ednaldomartins.covid19app.presentation.fragment.CountryStatusFragment"
+        android:label="fragment_country_status"
+        tools:layout="@layout/fragment_country_status" />
 
 </navigation>
