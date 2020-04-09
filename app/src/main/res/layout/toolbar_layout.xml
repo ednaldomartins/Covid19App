@@ -11,17 +11,6 @@
     android:theme="@style/Theme.AppCompat.NoActionBar"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    >
-
-    <TextView
-        android:id="@+id/toolbar_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:fontFamily="sans-serif-condensed"
-        android:text="Toolbar Title"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/title_size" />
+    app:layout_constraintTop_toTopOf="parent">
 
 </androidx.appcompat.widget.Toolbar>
