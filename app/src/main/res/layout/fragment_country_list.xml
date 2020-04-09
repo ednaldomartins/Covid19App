@@ -14,13 +14,22 @@
         android:layout_height="match_parent">
 
         <include
-            android:id="@+id/country_list_toolbar"
-            layout="@layout/toolbar_layout"
+            android:id="@+id/country_list_appbar"
+            layout="@layout/appbar_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/app_name_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/country_list_toolbar"
+            layout="@layout/toolbar_layout"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/bar_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/country_list_appbar" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/country_list_recycle_view"
@@ -43,13 +52,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/country_list_toolbar" />
+            app:layout_constraintTop_toBottomOf="@+id/country_list_appbar" />
 
         <include
             android:id="@+id/country_list_footer"
             layout="@layout/footer_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/bar_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

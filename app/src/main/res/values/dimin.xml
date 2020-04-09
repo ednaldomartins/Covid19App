@@ -5,4 +5,6 @@
     <dimen name="title_size">20sp</dimen>
     <dimen name="text_size">16sp</dimen>
 
+    <dimen name="bar_size">40sp</dimen>
+
 </resources>
