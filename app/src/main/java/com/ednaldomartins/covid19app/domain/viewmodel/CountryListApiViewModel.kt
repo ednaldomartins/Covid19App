@@ -8,9 +8,11 @@ import com.ednaldomartins.covid19app.database.api.CovidApi
 import com.ednaldomartins.covid19app.domain.entity.CountryJson
 import com.ednaldomartins.covid19app.domain.entity.CountryListJson
 import com.ednaldomartins.covid19app.domain.entity.CountryStatusJson
+import com.ednaldomartins.covid19app.domain.model.Sort
 import com.ednaldomartins.covid19app.util.CountryInfo
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.*
+import java.util.*
 
 class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), LifecycleObserver {
 
@@ -24,6 +26,7 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
     private var _responseCountryStatus = MutableLiveData<List<CountryStatusJson>>()
     val responseCountryStatusJson: LiveData<List<CountryStatusJson>> get() = _responseCountryStatus
 
+    private var _mementoCountryList = MutableLiveData<List<CountryJson>>()
     private var _requestCountryList = MutableLiveData<CountryListJson>()
     val responseCountryList: LiveData<CountryListJson> get() = _requestCountryList
 
@@ -55,7 +58,7 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
     val totalPages: Int get() = _totalPages
 
     /**
-     *  Funcoes para chamar lista de paisese apresentar
+     *  Funcoes para chamar lista de paises apresentar
      */
     fun requestCountryList() {
         uiCoroutineScope.launch {
@@ -76,8 +79,7 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
                 _requestCountryList.value = resultList
                 requestFlagImage( _requestCountryList.value!!.countries!! )
                 setPtBrLanguage( _requestCountryList.value!!.countries!! )
-                _totalPages = _requestCountryList.value!!.countries!!.size / PRESENTATION_LIST_SIZE
-                setPresentationList()
+                resetPresentationList() // esse metodo configura a lista de apresentacao para o estado inicial
             }
 
         }
@@ -89,15 +91,31 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         }
     }
 
+    //  buscar paises na lista recebida e aplica-los na lista de apresentacao
+    fun searchCountry (query: String) {
+        uiCoroutineScope.launch {
+            _requestCountryList.value?.countries.let {
+                val newList: MutableList<CountryJson>? = mutableListOf()
+                for (i in it!!.indices) {
+                    if (it[i].countryName.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)))
+                        newList!!.add( it[i] )
+                }
+                _mementoCountryList.value = newList
+                _totalPages = _mementoCountryList.value!!.size / PRESENTATION_LIST_SIZE +1
+                setPresentationList( )
+            }
+        }
+    }
+
     fun setPresentationList (page: Int = _actualPage) {
         _actualPage = validatePage(page)
         uiCoroutineScope.launch {
-            _requestCountryList.value?.let {
+            _mementoCountryList.value?.let {
                 val sizeSubList: Int =
                     if (_actualPage != _totalPages) PRESENTATION_LIST_SIZE *_actualPage
-                    else it.countries!!.size
+                    else it.size
 
-                _presentationCountryList.postValue( it.countries!!.subList( (_actualPage-1)* PRESENTATION_LIST_SIZE, sizeSubList) )
+                _presentationCountryList.postValue( it.subList( (_actualPage-1)* PRESENTATION_LIST_SIZE, sizeSubList) )
             }
         }
     }
@@ -106,6 +124,25 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         (page < 1) -> 1
         (page > _totalPages) -> _totalPages
         else -> page
+    }
+
+    fun resetPresentationList() {
+        _mementoCountryList.value = _requestCountryList.value?.countries
+        _totalPages = _requestCountryList.value!!.countries!!.size / PRESENTATION_LIST_SIZE
+        setPresentationList()
+    }
+
+    fun sortPresentationList(option: Int) {
+        _mementoCountryList.value?.let {
+            val sort = Sort()
+            when (option) {
+                1 -> _mementoCountryList.postValue( sort.sortByName(it) )
+                2 -> _mementoCountryList.postValue( sort.sortByConfirmedCases(it) )
+                3 -> _mementoCountryList.postValue( sort.sortByDeathCases(it) )
+                4 -> _mementoCountryList.postValue( sort.sortByRecoveredCases(it) )
+            }
+            setPresentationList()
+        }
     }
 
     /**
