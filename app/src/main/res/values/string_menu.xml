@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_search">Pesquisar</string>
+    <string name="menu_sort">Ordenar</string>
+    <string name="menu_sort_by_name">Ordenar por nome</string>
+    <string name="menu_sort_by_confirmed">Ordenar por casos confirmados</string>
+    <string name="menu_sort_by_deaths">Ordenar por casos de morte</string>
+    <string name="menu_sort_by_recovered">Ordenar por casos recuperados</string>
+    <string name="menu_help">Ajuda</string>
+
+</resources>
