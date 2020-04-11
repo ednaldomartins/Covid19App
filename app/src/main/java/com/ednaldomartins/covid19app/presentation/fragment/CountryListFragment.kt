@@ -1,13 +1,15 @@
 package com.ednaldomartins.covid19app.presentation.fragment
 
 import android.os.Bundle
-import android.view.*
-import androidx.appcompat.widget.SearchView
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-
 import com.ednaldomartins.covid19app.R
 import com.ednaldomartins.covid19app.domain.viewmodel.CountryListApiViewModel
 import com.ednaldomartins.covid19app.domain.viewmodel.ViewModelFactory
@@ -17,9 +19,8 @@ import com.ednaldomartins.covid19app.presentation.component.CountryViewHolder
 
 class CountryListFragment :
     BaseListFragment(),
-    SwipeRefreshLayout.OnRefreshListener,
-    CountryViewHolder.OnCardViewClickListener,
-    SearchView.OnQueryTextListener {
+    CountryViewHolder.OnCardViewClickListener
+{
 
     // viewmodel
     private lateinit var countryViewModelFactory: ViewModelFactory
@@ -86,12 +87,44 @@ class CountryListFragment :
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        return false
+        // esconder teclado
+        mSearchView.clearFocus()
+        return true
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
+        if (newText != "")
+            countryListApiViewModel.searchCountry(newText!!)
+        else
+            countryListApiViewModel.resetPresentationList()
 
-        return false
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.sort_by_name -> {
+                countryListApiViewModel.sortPresentationList(1)
+                true
+            }
+            R.id.sort_by_confirmed -> {
+                countryListApiViewModel.sortPresentationList(2)
+                true
+            }
+            R.id.sort_by_deaths -> {
+                countryListApiViewModel.sortPresentationList(3)
+                true
+            }
+            R.id.sort_by_recovered -> {
+                countryListApiViewModel.sortPresentationList(4)
+                true
+            }
+            R.id.menu_help -> {
+                // todo
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onCountryClick(countryName: String) {
