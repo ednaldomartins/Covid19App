@@ -1,13 +1,15 @@
 package com.ednaldomartins.covid19app.domain.model
 
 import com.ednaldomartins.covid19app.domain.entity.CountryJson
+import java.text.Normalizer
 
 class Sort {
 
-    // versão teste
-    fun sortByName(list: List<CountryJson>) = list.sortedBy {
-        it.countryName.replace("[\\Á]".toRegex(), "A")
-    }
+    fun sortByName(list: List<CountryJson>) =
+        list.sortedBy {
+            Normalizer.normalize(it.countryName, Normalizer.Form.NFD)
+                .replace("\\p{InCombiningDiacriticalMarks}+", "")
+        }
     fun sortByConfirmedCases(list: List<CountryJson>) = list.sortedByDescending { it.totalConfirmed }
     fun sortByDeathCases(list: List<CountryJson>) = list.sortedByDescending { it.totalDeaths }
     fun sortByRecoveredCases(list: List<CountryJson>) = list.sortedByDescending { it.totalRecovered }
