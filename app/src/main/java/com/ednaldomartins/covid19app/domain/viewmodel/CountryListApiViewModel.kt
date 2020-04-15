@@ -73,7 +73,7 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
             val resultList = callDeferred.await()
 
             if (resultList.countries.isNullOrEmpty())
-                requestErro(_requestCountryList, "A busca não encontrou países.")
+                requestError(_requestCountryList, "A busca não encontrou países.")
             //  atualizar lista e pegar bandeira dos países
             else {
                 _requestCountryList.value = resultList
@@ -84,10 +84,10 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
 
         }
         catch(t: JsonDataException) {
-            requestErro(_requestCountryList, "ERRO: Problema com os dados dos países recuperados.")
+            requestError(_requestCountryList, "ERRO: Problema com os dados dos países recuperados.")
         }
         catch (t: Throwable) {
-            requestErro(_requestCountryList, "ERRO: A lista de países não foi recuperada.")
+            requestError(_requestCountryList, "ERRO: A lista de países não foi recuperada.")
         }
     }
 
@@ -120,6 +120,8 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         }
     }
 
+    private var _optionSort: Int = 1
+
     private fun validatePage(page: Int) =  when {
         (page < 1) -> 1
         (page > _totalPages) -> _totalPages
@@ -128,12 +130,13 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
 
     fun resetPresentationList() {
         _mementoCountryList.value = _requestCountryList.value?.countries
-        _totalPages = _requestCountryList.value!!.countries!!.size / PRESENTATION_LIST_SIZE
-        setPresentationList()
+        _totalPages = _requestCountryList.value!!.countries!!.size / PRESENTATION_LIST_SIZE +1
+        sortPresentationList()
     }
 
-    fun sortPresentationList(option: Int) {
+    fun sortPresentationList(option: Int = _optionSort) {
         _mementoCountryList.value?.let {
+            _optionSort = option
             val sort = Sort()
             when (option) {
                 1 -> _mementoCountryList.postValue( sort.sortByName(it) )
@@ -179,18 +182,18 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
     /**
      * Funcoes para tratar e adaptar dados da apresentacao
      */
-    private fun requestFlagImage(coutryList: List<CountryJson>) {
-        for (i in coutryList.indices)
-            coutryList[i].flagImage = CountryInfo.URL_ROOT_FLAG + coutryList[i].countryCode + CountryInfo.URL_TYPE_FLAG
+    private fun requestFlagImage(countryList: List<CountryJson>) {
+        for (i in countryList.indices)
+            countryList[i].flagImage = CountryInfo.URL_ROOT_FLAG + countryList[i].countryCode + CountryInfo.URL_TYPE_FLAG
     }
 
-    private fun setPtBrLanguage(coutryList: List<CountryJson>) {
-        for (i in coutryList.indices) {
+    private fun setPtBrLanguage(countryList: List<CountryJson>) {
+        for (i in countryList.indices) {
             for (j in CountryInfo.list.indices) {
                 //  list[j][3] -> codigo do pais
                 //  list[j][1] -> nome do pais em PtBR
-                if (coutryList[i].countryCode == CountryInfo.list[j][3]) {
-                    coutryList[i].countryName = CountryInfo.list[j][1]
+                if (countryList[i].countryCode == CountryInfo.list[j][3]) {
+                    countryList[i].countryName = CountryInfo.list[j][1]
                     break   //  break for J
                 }
             }
@@ -200,11 +203,12 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
     /**
      * funcoes para retornar mensagem de erro
      */
-    private fun requestErro(countryList: MutableLiveData<CountryListJson>, s: String) {
+    private fun requestError(countryList: MutableLiveData<CountryListJson>, s: String) {
         Toast.makeText(getApplication(), s,Toast.LENGTH_LONG).show()
         val countiesJson = CountryListJson(  )
         countiesJson.countries = listOfNotNull( CountryJson(countryName = s) )
         countryList.value = ( countiesJson )
+        resetPresentationList()
     }
 
 }
