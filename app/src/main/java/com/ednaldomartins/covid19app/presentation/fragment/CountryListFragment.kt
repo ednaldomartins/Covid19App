@@ -5,11 +5,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import com.ednaldomartins.covid19app.R
 import com.ednaldomartins.covid19app.domain.viewmodel.CountryListApiViewModel
 import com.ednaldomartins.covid19app.domain.viewmodel.ViewModelFactory
@@ -21,7 +18,6 @@ class CountryListFragment :
     BaseListFragment(),
     CountryViewHolder.OnCardViewClickListener
 {
-
     // viewmodel
     private lateinit var countryViewModelFactory: ViewModelFactory
     private lateinit var countryListAdapter: CountryListAdapter
@@ -36,7 +32,11 @@ class CountryListFragment :
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         countryListApiViewModel.presentationCountryList.observe(this.viewLifecycleOwner, Observer {
             mListProgressBar.visibility = View.GONE
@@ -50,8 +50,6 @@ class CountryListFragment :
                 mCountryRecyclerView.visibility = View.VISIBLE
             }
         })
-
-        return view
     }
 
     private fun initViewModel() {
@@ -60,6 +58,28 @@ class CountryListFragment :
         countryViewModelFactory = ViewModelFactory(application)
         countryListApiViewModel = ViewModelProvider(activity!!, countryViewModelFactory)
             .get(CountryListApiViewModel::class.java)
+    }
+
+    override fun onResume() {
+        //  se estado do recyclerView nao for nulo recupera-lo
+        if (countryListApiViewModel.recyclerViewState != null) {
+            mCountryRecyclerView.layoutManager?.onRestoreInstanceState(countryListApiViewModel.recyclerViewState)
+        } else {
+            //  se a lista recuperada da API nao for nula, setar a lista de apresentacao
+            if (countryListApiViewModel.responseCountryList.value != null)
+                countryListApiViewModel.setPresentationList()
+            //  se a lista recuperada da API for nula, entao recupera-la antes na API e att apresentacao
+            else
+                countryListApiViewModel.requestCountryList()
+        }
+        super.onResume()
+    }
+
+    override fun onStop() {
+        mCountryRecyclerView.layoutManager?.let {
+            countryListApiViewModel.setRecyclerViewState(it.onSaveInstanceState())
+        }
+        super.onStop()
     }
 
     override fun onClick(v: View?) {
@@ -128,29 +148,7 @@ class CountryListFragment :
     }
 
     override fun onCountryClick(countryName: String) {
-        
-    }
-
-    override fun onResume() {
-        //  se estado do recyclerView nao for nulo recupera-lo
-        if (countryListApiViewModel.recyclerViewState != null) {
-            mCountryRecyclerView.layoutManager?.onRestoreInstanceState(countryListApiViewModel.recyclerViewState)
-        } else {
-            //  se a lista recuperada da API nao for nula, setar a lista de apresentacao
-            if (countryListApiViewModel.responseCountryList.value != null)
-                countryListApiViewModel.setPresentationList()
-            //  se a lista recuperada da API for nula, entao recupera-la antes na API e att apresentacao
-            else
-                countryListApiViewModel.requestCountryList()
-        }
-        super.onResume()
-    }
-
-    override fun onStop() {
-        mCountryRecyclerView.layoutManager?.let {
-            countryListApiViewModel.setRecyclerViewState(it.onSaveInstanceState())
-        }
-        super.onStop()
+        //  TODO
     }
 
 }
