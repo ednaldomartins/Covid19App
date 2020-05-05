@@ -128,9 +128,7 @@ class CountryListFragment :
     }
 
     override fun onCountryClick(countryName: String) {
-        countryListApiViewModel.requestCountryStatus(countryName, "deaths") //teste com deaths
-        view!!.findNavController()
-            .navigate(R.id.action_countryListFragment_to_countryStatusFragment)
+        
     }
 
     override fun onResume() {

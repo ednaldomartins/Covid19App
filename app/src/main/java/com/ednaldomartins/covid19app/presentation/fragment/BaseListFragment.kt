@@ -1,19 +1,19 @@
 package com.ednaldomartins.covid19app.presentation.fragment
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
+import android.widget.*
 import androidx.fragment.app.Fragment
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ednaldomartins.covid19app.R
+import kotlin.coroutines.Continuation
 
 open class BaseListFragment :
     Fragment(),
@@ -28,12 +28,12 @@ open class BaseListFragment :
     protected lateinit var mCountryRecyclerView: RecyclerView
 
     //  appbar
-    protected lateinit var appbar: Toolbar
+    private lateinit var appbar: Toolbar
 
     //  toolbar
-    protected lateinit var toolbar: Toolbar
+    private lateinit var toolbar: Toolbar
     protected lateinit var mSearchView: SearchView
-    protected lateinit var mImageButton: ImageButton
+    protected lateinit var mImageSortButton: MenuItem
 
     //  view footer
     private lateinit var mButtonFirstPage: Button
@@ -51,16 +51,20 @@ open class BaseListFragment :
         initViews(view)
         setHasOptionsMenu(true)
 
-        // setup RecyclerView
-        val layoutManager = LinearLayoutManager(activity)
+        // setup RecyclerView// configurando RecyclerView
+        val layoutManager: RecyclerView.LayoutManager =
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+                LinearLayoutManager(activity)
+            else
+                GridLayoutManager(activity, 2)
+
         mCountryRecyclerView.layoutManager = layoutManager
         mCountryRecyclerView.setHasFixedSize(true)
 
         return view
     }
 
-
-    protected fun initViews(v: View) {
+    private fun initViews(v: View) {
         //  setup layout
         mSwipeRefreshLayout = v.findViewById(R.id.list_fragment_swipe_refresh_layout)
         mSwipeRefreshLayout.setOnRefreshListener(this)
@@ -70,7 +74,6 @@ open class BaseListFragment :
         //  setup appbar
         appbar = v.findViewById(R.id.country_list_appbar)
         appbar.title = ""
-        //(activity as AppCompatActivity?)!!.setSupportActionBar(appbar)
 
         //  setup toolbar
         toolbar = v.findViewById(R.id.country_list_toolbar)

@@ -40,14 +40,6 @@ class CountryListApiViewModel (var app: Application) : AndroidViewModel(app), Li
         this._recyclerViewState = recyclerViewState
     }
 
-//    //  LifeCycle
-//    private var _lifecycle: Lifecycle? = null
-//    val lifecycle: Lifecycle? get() = _lifecycle
-//    fun setLifecycle(lf: Lifecycle) {
-//        _lifecycle = lf
-//        _lifecycle?.addObserver(this)
-//    }
-
     companion object {
         private const val PRESENTATION_LIST_SIZE: Int = 20
     }

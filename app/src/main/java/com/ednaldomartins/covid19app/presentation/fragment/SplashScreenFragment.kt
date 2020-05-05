@@ -1,11 +1,11 @@
 package com.ednaldomartins.covid19app.presentation.fragment
 
 import android.os.Bundle
-import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 
@@ -30,9 +30,9 @@ class SplashScreenFragment : Fragment() {
 
         //  chamar a lista da API enquanto apresenta telas de boas vindas
         countryListApiViewModel.requestCountryList()
-        Handler().postDelayed({
+        countryListApiViewModel.presentationCountryList.observe(this.viewLifecycleOwner, Observer {
             view.findNavController().navigate(R.id.action_splashScreenFragment_to_countryListFragment)
-        },1000)  //  tempo minimo que eu darei ao splash
+        })
 
         return view
     }
